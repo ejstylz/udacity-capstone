@@ -10,19 +10,19 @@ commands:
                   when: on_fail
                   command: |
                       echo "deleting image"
-                      docker run --rm -it ejstylz/uda-capstone:latest -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+                      docker run --rm -it ejstylz/uda-capstone:latest -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
 
 orbs:
     aws-eks: circleci/aws-eks@1.1.0
     kubernetes: circleci/kubernetes@0.4.0
 
 executors:
-  python:
-    docker:
-      - image: circleci/python:3.7.3-stretch
-  aws:
-    docker:
-      - image: amazon/aws-cli
+    python:
+        docker:
+            - image: circleci/python:3.7.3-stretch
+    aws:
+        docker:
+            - image: amazon/aws-cli
 
 jobs:
     build:
@@ -63,7 +63,7 @@ jobs:
               # Build, tag and push my docker image to docker hub
               name: Push image to docker hub
               command: |
-                  docker login -u ${DOCKER_USERName} -p ${DOCKER_PASSWORD}
+                  docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
                   # Build docker image                       
                   docker build --tag=uda-capstone:latest .
                   # Tag image before pushing
@@ -134,40 +134,40 @@ jobs:
                       kubectl get nodes
                       kubectl get deployment
                       kubectl get pods -o wide
-    
-      delete-cluster:
+
+    delete-cluster:
         executor: aws-eks/python3
         steps:
-          - checkout
-          - aws-eks/install-aws-iam-authenticator:
-              release-tag: ''
-          - run:
-              name: Install eksctl
-              command: |
-                  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-                  sudo mv /tmp/eksctl /usr/local/bin
-                  ls -l /usr/local/bin/eksctl
-          - aws-eks/delete-cluster:
-              cluster-name: uda-capstone-cluster
-              aws-region: ${AWS_DEFAULT_REGION}
-              wait: true  
+            - checkout
+            - aws-eks/install-aws-iam-authenticator:
+                  release-tag: ""
+            - run:
+                  name: Install eksctl
+                  command: |
+                      curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+                      sudo mv /tmp/eksctl /usr/local/bin
+                      ls -l /usr/local/bin/eksctl
+            - aws-eks/delete-cluster:
+                  cluster-name: uda-capstone-cluster
+                  aws-region: ${AWS_DEFAULT_REGION}
+                  wait: true
 
 workflows:
-  deployment:
-    jobs:
-      - build
-      - push-image:
-          requires:
-            - build      
-      - create-eks-cluster:
-          cluster-name: sunil-eks-cluster      
-          requires:
+    deployment:
+        jobs:
             - build
-      - deploy-app:
-          cluster-name: sunil-eks-cluster
-          requires:
-            - create-eks-cluster          
-      - delete-cluster:
-          cluster-name: sunil-eks-cluster
-          requires:
-            - deploy-app  
+            - push-image:
+                  requires:
+                      - build
+            - create-eks-cluster:
+                  cluster-name: sunil-eks-cluster
+                  requires:
+                      - build
+            - deploy-app:
+                  cluster-name: sunil-eks-cluster
+                  requires:
+                      - create-eks-cluster
+            - delete-cluster:
+                  cluster-name: sunil-eks-cluster
+                  requires:
+                      - deploy-app
