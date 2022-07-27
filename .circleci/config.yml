@@ -159,7 +159,7 @@ workflows:
                       - build
             - create-cluster:
                   requires:
-                      - build
+                      - push-docker-image
             - deploy-app:
                   requires:
                       - create-cluster
