@@ -107,7 +107,7 @@ jobs:
             - checkout
             - kubernetes/install
             - aws-eks/update-kubeconfig-with-authenticator:
-                  cluster-name: uda-capstone-cluster
+                  cluster-name: uda-capstone
                   install-kubectl: true
                   aws-region: ${AWS_DEFAULT_REGION}
 
@@ -148,7 +148,7 @@ jobs:
                       sudo mv /tmp/eksctl /usr/local/bin
                       ls -l /usr/local/bin/eksctl
             - aws-eks/delete-cluster:
-                  cluster-name: uda-capstone-cluster
+                  cluster-name: uda-capstone
                   aws-region: ${AWS_DEFAULT_REGION}
                   wait: true
 
@@ -159,15 +159,12 @@ workflows:
             - push-image:
                   requires:
                       - build
-            - create-eks-cluster:
-                  cluster-name: sunil-eks-cluster
+            - create-cluster:
                   requires:
                       - build
             - deploy-app:
-                  cluster-name: sunil-eks-cluster
                   requires:
-                      - create-eks-cluster
+                      - create-cluster
             - delete-cluster:
-                  cluster-name: sunil-eks-cluster
                   requires:
                       - deploy-app
