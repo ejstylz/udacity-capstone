@@ -93,13 +93,6 @@ jobs:
                   nodes-max: 5
                   ssh-access: false
                   ssh-public-key: ""
-            - run:
-                  name: Test Create cluster
-                  command: sleep 5
-                      kubectl get svc
-                      kubectl get nodes
-                      kubectl get deployment
-                      kubectl get pods -o wide
 
     deploy-app:
         executor: aws-eks/python3
@@ -115,25 +108,9 @@ jobs:
                   get-rollout-status: false
                   resource-file-path: "k8s/deployment.yml"
                   resource-name: deployment/uda-capstone
-            - run:
-                  name: Test App deployment
-                  command: |
-                      sleep 5
-                      kubectl get svc
-                      kubectl get nodes
-                      kubectl get deployment
-                      kubectl get pods -o wide
             - kubernetes/create-or-update-resource:
                   resource-file-path: "k8s/load-balancer.yml"
                   resource-name: deployment/uda-capstone
-            - run:
-                  name: Test Load balancer deployment
-                  command: |
-                      sleep 5
-                      kubectl get svc
-                      kubectl get nodes
-                      kubectl get deployment
-                      kubectl get pods -o wide
 
     delete-cluster:
         executor: aws-eks/python3
