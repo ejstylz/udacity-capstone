@@ -62,13 +62,15 @@ jobs:
                   # Build, tag and push my docker image to docker hub
                   name: Push image to docker hub
                   command: |
+                      python3 -m venv venv
+                      . venv/bin/activate
                       docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
                       # Build docker image                       
                       docker build --tag=uda-capstone:latest .
                       # Tag image before pushing
-                      docker tag uda-capstone:${CIRCLE_WORKFLOW_ID:0:7} ejstylz/uda-capstone:latest
+                      docker tag uda-capstone ejstylz/uda-capstone
                       # Push to docker hub            
-                      docker push ejstylz/uda-capstone:latest
+                      docker push ejstylz/uda-capstone
             - delete-image
 
     create-cluster:
