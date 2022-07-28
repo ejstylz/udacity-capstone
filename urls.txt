@@ -1,0 +1,2 @@
+Github Repo: https://github.com/ejstylz/udacity-capstone
+Docker Hub Image: https://hub.docker.com/repository/docker/ejstylz/uda-capstone
